@@ -5,6 +5,11 @@ SUDO_USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
 export SUDO_USER_HOME
 
 
+# Make sure Fedora root is expanded
+lvextend --extents +100%FREE /dev/mapper/fedora-root
+xfs_growfs /dev/mapper/fedora-root
+
+
 # ------------------------------------------------------------
 
 
@@ -169,3 +174,10 @@ mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/build-repos $SUDO_USER_HOME/logs
 chown $SUDO_USER: $SUDO_USER_HOME/.locks $SUDO_USER_HOME/build-repos $SUDO_USER_HOME/logs
 
 printf "\n#### END CONFIG : Build Automation\n\n"
+
+
+# ------------------------------------------------------------
+
+read -p "Press enter to reboot"
+
+reboot
