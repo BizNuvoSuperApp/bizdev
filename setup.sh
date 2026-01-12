@@ -1,4 +1,4 @@
-GITDIR="https://raw.githubusercontent.com/myramoki/bizdev/main"
+GITDIR="https://raw.githubusercontent.com/BizNuvoSuperApp/bizdev/main"
 export GITDIR
 
 SUDO_USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
@@ -8,6 +8,8 @@ export SUDO_USER_HOME
 # Make sure Fedora root is expanded
 lvextend --extents +100%FREE /dev/mapper/fedora-root
 xfs_growfs /dev/mapper/fedora-root
+
+sleep 5
 
 
 # ------------------------------------------------------------
@@ -55,7 +57,7 @@ printf "\n#### FINISHED CONFIG : Network\n\n"
 
 
 cd $SUDO_USER_HOME
-sudo -u bn git clone https://github.com/myramoki/bizdev-dotfiles.git .dotfiles
+sudo -u bn git clone https://github.com/BizNuvoSuperApp/bizdev-dotfiles.git .dotfiles
 
 cd $SUDO_USER_HOME/.dotfiles
 sudo -u bn stow --adopt .
