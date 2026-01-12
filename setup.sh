@@ -73,10 +73,10 @@ sed -i -e 's/^%wheel/# %wheel/' -e 's/^# %wheel/%wheel/' /etc/sudoers
 
 printf "\n#### BEGIN CONFIG : Java Multi\n\n"
 
-curl -o /tmp/jdk.tar.gz https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-aarch64_bin.tar.gz
+curl -o /tmp/jdk.tar.gz https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-x64_bin.tar.gz
 
-tar -C .local -xvf /tmp/jdk.tar.gz
-(cd .local && ln -s jdk-21.0.8 jdk-21)
+sudo tar -C .local -xvf /tmp/jdk.tar.gz
+(cd .local && ln -s jdk-21.0.8 jdk-21 && chown $SUDO_USER: .local/jdk-21)
 
 printf "\n#### FINISHED CONFIG : Java\n\n"
 
