@@ -63,6 +63,7 @@ cd $SUDO_USER_HOME/.dotfiles
 sudo -u bn stow --adopt .
 sudo -u bn git reset --hard
 
+curl -s https://ohmyposh.dev/install.sh | sudo -u bn bash -s
 
 # allows wheel users to sudo without a password 
 sed -i -e 's/^%wheel/# %wheel/' -e 's/^# %wheel/%wheel/' /etc/sudoers
