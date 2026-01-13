@@ -4,6 +4,10 @@ finish_setup() {
     reboot
 }
 
+check_cond() {
+    [[ "${1:0:1}" > "$2" -o "${1:0:1}" = "$2" ]] || finish_setup
+}
+
 
 echo "
 #
@@ -31,7 +35,7 @@ SUDO_USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
 # ------------------------------------------------------------
 
 
-[[ "$respType" >= "A" ]] || finish_setup
+check_cond "$respType" "A"
 
 # Make sure Fedora root is expanded
 lvextend --extents +100%FREE /dev/mapper/fedora-root
@@ -43,7 +47,7 @@ sleep 5
 # ------------------------------------------------------------
 
 
-[[ "$respType" >= "B" ]] || finish_setup
+check_cond "$respType" "B"
 
 printf "\n#### BEGIN CONFIG : Software\n\n"
 
@@ -62,7 +66,7 @@ sleep 2
 # ------------------------------------------------------------
 
 
-[[ "$respType" >= "C" ]] || finish_setup
+check_cond "$respType" "C"
 
 printf "\n#### BEGIN CONFIG : Network\n\n"
 
@@ -90,7 +94,7 @@ sleep 2
 # ------------------------------------------------------------
 
 
-[[ "$respType" >= "D" ]] || finish_setup
+check_cond "$respType" "D"
 
 printf "\n#### BEGIN CONFIG : User setup\n\n"
 
@@ -113,7 +117,7 @@ sleep 2
 # ------------------------------------------------------------
 
 
-[[ "$respType" >= "E" ]] || finish_setup
+check_cond "$respType" "E"
 
 printf "\n#### BEGIN CONFIG : Java Multi\n\n"
 
@@ -133,7 +137,7 @@ sleep 2
 # ------------------------------------------------------------
 
 
-[[ "$respType" >= "F" ]] || finish_setup
+check_cond "$respType" "F"
 
 printf "\n#### BEGIN CONFIG : Github SSH Keys\n\n"
 
@@ -199,7 +203,7 @@ sleep 2
 # ------------------------------------------------------------
 
 
-[[ "$respType" >= "G" ]] || finish_setup
+check_cond "$respType" "G"
 
 printf "\n#### BEGIN CONFIG : SFTP\n\n"
 
@@ -244,7 +248,7 @@ sleep 2
 # ------------------------------------------------------------
 
 
-[[ "$respType" >= "H" ]] || finish_setup
+check_cond "$respType" "H"
 
 printf "\n#### BEGIN CONFIG : Build Automation\n\n"
 
