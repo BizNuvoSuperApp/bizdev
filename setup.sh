@@ -219,6 +219,8 @@ check_cond "$respType" "G"
 
 printf "\n#### BEGIN CONFIG : SFTP\n\n"
 
+cd $SUDO_USER_HOME
+
 printf "Adding biznuvo sftp user\n"
 useradd -m -U -s /sbin/nologin biznuvo
 
@@ -233,7 +235,8 @@ chmod -R 755 /var/sftp
 chown biznuvo: /var/sftp/biznuvo/downloads
 chmod g+w /var/sftp/biznuvo/downloads
 
-sudo -u bn ln -s /var/sftp/biznuvo sftp
+ln -s /var/sftp/biznuvo sftp
+chown $SUDO_USER: sftp
 
 
 printf "Updating sshd with more restrictions for build server\n"
@@ -313,7 +316,12 @@ check_cond "$respType" "I"
 
 printf "\n#### BEGIN CONFIG : Misc\n\n"
 
+cd $SUDO_USER_HOME
+
 curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | sudo -u bn bash
+
+mkdir docker
+chown $SUDO_USER: docker
 
 printf "\n#### END CONFIG : Misc\n\n"
 
