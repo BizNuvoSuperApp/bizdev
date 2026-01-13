@@ -24,8 +24,6 @@ dnf -y -q install vim stow git yazi podman msmtp
 # https://discussion.fedoraproject.org/t/vim-default-editor-in-coreos/71356/4
 dnf -y swap nano-default-editor vim-default-editor --allowerasing
 
-touch /tmp/doreboot
-
 printf "\n#### FINISHED CONFIG : Software\n\n"
 
 
@@ -58,10 +56,7 @@ printf "\n#### FINISHED CONFIG : Network\n\n"
 
 cd $SUDO_USER_HOME
 sudo -u bn git clone https://github.com/BizNuvoSuperApp/bizdev-dotfiles.git .dotfiles
-
-cd $SUDO_USER_HOME/.dotfiles
-sudo -u bn stow --adopt .
-sudo -u bn git reset --hard
+sudo -u bn stow --no-folding .dotfiles
 
 curl -s https://ohmyposh.dev/install.sh | sudo -u bn bash -s
 
@@ -74,10 +69,13 @@ sed -i -e 's/^%wheel/# %wheel/' -e 's/^# %wheel/%wheel/' /etc/sudoers
 
 printf "\n#### BEGIN CONFIG : Java Multi\n\n"
 
-curl -o /tmp/jdk.tar.gz https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-x64_bin.tar.gz
+cd $SUDO_USER_HOME/.local
 
-sudo tar -C .local -xvf /tmp/jdk.tar.gz
-(cd .local && ln -s jdk-21.0.8 jdk-21 && chown $SUDO_USER: .local/jdk-21)
+curl https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-x64_bin.tar.gz | tar -xvf -
+
+ln -s jdk-21.0.8 jdk-21
+
+chown -R $SUDO_USER: $SUDO_USER_HOME/.local/jdk*
 
 printf "\n#### FINISHED CONFIG : Java\n\n"
 
@@ -89,22 +87,57 @@ printf "\n#### BEGIN CONFIG : Github SSH Keys\n\n"
 
 printf "#- fetch ssh keys\n"
 
-mkdir -p $SUDO_USER_HOME/.ssh
+tempdir=$(mktemp -d)
 
 sshkeystempfile=$(mktemp /tmp/tmp.dl.sshkeys.XXXXXXXXXX)
-curl -sL -o $sshkeystempfile $GITDIR/biznuvo-server-keys.tar.xz.gpg
-gpg -d $sshkeystempfile | tar -J -xvf - -C $SUDO_USER_HOME/.ssh
+curl -sL -o $sshkeystempfile $GITDIR/biznuvo-deploy-keys.tar.gpg
+gpg -d $sshkeystempfile | tar -xvf - -C $tempdir
 
 printf "#- configure ssh config\n"
 
-printf "
-Host github.com
-    Hostname ssh.github.com
-    Port 443
-    IdentityFile=~/.ssh/biznuvo-server-v2-id_ed25519
-" >> $SUDO_USER_HOME/.ssh/config
+if [ -f "$SUDO_USER_HOME/.gitconfig" ]
+then
+    printf "Backing up $SUDO_USER_HOME/.gitconfig to $SUDO_USER_HOME/.gitconfig.bak\n"
+    cp $SUDO_USER_HOME/.gitconfig $SUDO_USER_HOME/.gitconfig.bak
+else
+    printf "Creating $SUDO_USER_HOME/.gitconfig file\n"
+    touch $SUDO_USER_HOME/.gitconfig
+fi
 
-chown -R $SUDO_USER: $SUDO_USER_HOME/.ssh
+cd $tempdir
+
+for file in *.pub
+do
+    pkey=$(basename $file .pub)
+    repo=$(printf $pkey | sed -e 's/^github-//' -e 's/-id_ed25519//')
+    
+    if ! grep -s -E "git@github-$repo" $SUDO_USER_HOME/.gitconfig
+    then
+        printf "Installing config entry for repository %s\n" $repo
+
+        printf '
+[url "git@github-%s:BizNuvoSuperApp/%s"]
+    insteadOf = git@github.com:BizNuvoSuperApp/%s
+' $repo $repo $repo >> $SUDO_USER_HOME/.gitconfig
+
+        printf '
+Host github-%s
+    HostName ssh.github.com
+    Port 443
+    IdentityFile ~/.ssh/%s
+' $repo $pkey >> $SUDO_USER_HOME/.ssh/config
+
+    fi
+
+    cp -v $pkey ${pkey}.pub $SUDO_USER_HOME/.ssh
+    chmod go-rwx $SUDO_USER_HOME/.ssh/$pkey
+done
+
+rm -rf $tempdir
+
+chown -R $SUDO_USER: $SUDO_USER_HOME/.gitconfig $SUDO_USER_HOME/.ssh
+
+sudo -u bn ssh -T git@github.com
 
 printf "\n#### FINISHED CONFIG : Github SSH Keys\n\n"
 
@@ -127,6 +160,8 @@ mkdir -p /var/sftp/biznuvo/downloads
 chmod -R 755 /var/sftp
 chown biznuvo: /var/sftp/biznuvo/downloads
 chmod g+w /var/sftp/biznuvo/downloads
+
+sudo -u bn ln -s /var/sftp/biznuvo sftp
 
 
 printf "Updating sshd with more restrictions for build server\n"
@@ -164,17 +199,31 @@ chmod 600 .msmtprc
 
 printf "Creating automation control files\n"
 
-mkdir $SUDO_USER_HOME/build-automation
-cd $SUDO_USER_HOME/build-automation
+mkdir $SUDO_USER_HOME/automation
+cd $SUDO_USER_HOME/automation
 
 printf "mailnotify=DEST1\nmailother=\n" > build-email-aliases
 
 curl -O "$GITDIR/scripts/{build-if-changed.sh,build.sh,cron-build.sh,setup.sh}"
-chown -R $SUDO_USER: $SUDO_USER_HOME/build-automation
-chmod u+x $SUDO_USER_HOME/build-automation/*.sh
+chown -R $SUDO_USER: $SUDO_USER_HOME/automation
+chmod u+x $SUDO_USER_HOME/automation/*.sh
 
-mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/build-repos $SUDO_USER_HOME/logs
-chown $SUDO_USER: $SUDO_USER_HOME/.locks $SUDO_USER_HOME/build-repos $SUDO_USER_HOME/logs
+mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
+chown $SUDO_USER: $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
+
+
+echo "JAVA_HOME=/home/bn/.local/jdk-21
+PATH=/usr/local/bin:/usr/bin:/home/bn/.local/jdk-21/bin
+CB_MAIL_TO=dmcclure@biznuvo.com
+CB_MAIL_CC=
+
+0 0 * * * find /var/sftp/biznuvo/downloads -type f -mtime +21 -delete > $HOME/cleanup.log
+
+# Template for build automation
+# */3 * * * * /home/bn/automation/cron-build.sh main 2>&1 >/home/bn/logs/main.debug
+" > $SUDO_USER_HOME/cronfile
+
+chown $SUDO_USER: $SUDO_USER_HOME/cronfile
 
 printf "\n#### END CONFIG : Build Automation\n\n"
 
