@@ -161,6 +161,15 @@ else
     touch $SUDO_USER_HOME/.gitconfig
 fi
 
+if [ -f "$SUDO_USER_HOME/.ssh/config" ]
+then
+    printf "Backing up $SUDO_USER_HOME/.ssh/config to $SUDO_USER_HOME/.ssh/config.bak\n"
+    cp $SUDO_USER_HOME/.ssh/config $SUDO_USER_HOME/.ssh/config.bak
+else
+    printf "Creating $SUDO_USER_HOME/.ssh/config\n"
+    mkdir -p $SUDO_USER_HOME/.ssh
+fi
+
 cd $tempdir
 
 for file in *.pub
