@@ -56,7 +56,9 @@ printf "\n#### FINISHED CONFIG : Network\n\n"
 
 cd $SUDO_USER_HOME
 sudo -u bn git clone https://github.com/BizNuvoSuperApp/bizdev-dotfiles.git .dotfiles
-sudo -u bn stow --no-folding .dotfiles
+
+cd $SUDO_USER_HOME/.dotfiles
+sudo -u bn stow --adopt --no-folding .
 
 curl -s https://ohmyposh.dev/install.sh | sudo -u bn bash -s
 
