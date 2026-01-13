@@ -105,6 +105,7 @@ sudo -u bn git clone https://github.com/BizNuvoSuperApp/bizdev-dotfiles.git .dot
 
 cd $SUDO_USER_HOME/.dotfiles
 sudo -u bn stow --adopt --no-folding .
+sudo -u bn git reset --hard
 
 curl -s https://ohmyposh.dev/install.sh | sudo -u bn bash -s
 
