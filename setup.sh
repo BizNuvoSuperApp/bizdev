@@ -26,6 +26,8 @@ dnf -y swap nano-default-editor vim-default-editor --allowerasing
 
 printf "\n#### FINISHED CONFIG : Software\n\n"
 
+sleep 2
+
 
 # ------------------------------------------------------------
 
@@ -50,6 +52,8 @@ fi
 
 printf "\n#### FINISHED CONFIG : Network\n\n"
 
+sleep 2
+
 
 # ------------------------------------------------------------
 
@@ -65,6 +69,8 @@ curl -s https://ohmyposh.dev/install.sh | sudo -u bn bash -s
 # allows wheel users to sudo without a password 
 sed -i -e 's/^%wheel/# %wheel/' -e 's/^# %wheel/%wheel/' /etc/sudoers
 
+sleep 2
+
 
 # ------------------------------------------------------------
 
@@ -73,13 +79,15 @@ printf "\n#### BEGIN CONFIG : Java Multi\n\n"
 
 cd $SUDO_USER_HOME/.local
 
-curl https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-x64_bin.tar.gz | tar -xvf -
+curl -sL https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-x64_bin.tar.gz | tar -xvzf -
 
 ln -s jdk-21.0.8 jdk-21
 
 chown -R $SUDO_USER: $SUDO_USER_HOME/.local/jdk*
 
 printf "\n#### FINISHED CONFIG : Java\n\n"
+
+sleep 2
 
 
 # ------------------------------------------------------------
@@ -143,6 +151,8 @@ sudo -u bn ssh -T git@github.com
 
 printf "\n#### FINISHED CONFIG : Github SSH Keys\n\n"
 
+sleep 2
+
 
 # ------------------------------------------------------------
 
@@ -183,6 +193,8 @@ Match User biznuvo
 systemctl restart sshd
 
 printf "\n#### END CONFIG : SFTP\n\n"
+
+sleep 2
 
 
 # ------------------------------------------------------------
