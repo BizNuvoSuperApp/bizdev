@@ -2,10 +2,11 @@ finish_setup() {
     read -p "Press enter to reboot"
 
     reboot
+    exit
 }
 
 check_cond() {
-    [[ "${1:0:1}" > "$2" || "${1:0:1}" = "$2" ]] || finish_setup && exit
+    [[ "${1:0:1}" > "$2" || "${1:0:1}" = "$2" ]] || finish_setup
 }
 
 
