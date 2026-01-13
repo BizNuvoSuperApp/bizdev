@@ -1,9 +1,37 @@
+finish_setup() {
+    read -p "Press enter to reboot"
+
+    reboot
+}
+
+
+echo "
+#
+# Choose which setup you want to run:
+#
+#   A - Expand drive
+#   B - Install software
+#   C - Configure network
+#   D - User config
+#   E - Java
+#   F - Github keys
+#   G - SFTP
+#   H - Build Automation
+#   Z - all
+#
+"
+
+read -p "?? Select setup type: " respType
+
+
 GITDIR="https://raw.githubusercontent.com/BizNuvoSuperApp/bizdev/main"
-export GITDIR
-
 SUDO_USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
-export SUDO_USER_HOME
 
+
+# ------------------------------------------------------------
+
+
+[[ "$respType" >= "A" ]] || finish_setup
 
 # Make sure Fedora root is expanded
 lvextend --extents +100%FREE /dev/mapper/fedora-root
@@ -14,6 +42,8 @@ sleep 5
 
 # ------------------------------------------------------------
 
+
+[[ "$respType" >= "B" ]] || finish_setup
 
 printf "\n#### BEGIN CONFIG : Software\n\n"
 
@@ -31,6 +61,8 @@ sleep 2
 
 # ------------------------------------------------------------
 
+
+[[ "$respType" >= "C" ]] || finish_setup
 
 printf "\n#### BEGIN CONFIG : Network\n\n"
 
@@ -58,6 +90,10 @@ sleep 2
 # ------------------------------------------------------------
 
 
+[[ "$respType" >= "D" ]] || finish_setup
+
+printf "\n#### BEGIN CONFIG : User setup\n\n"
+
 cd $SUDO_USER_HOME
 sudo -u bn git clone https://github.com/BizNuvoSuperApp/bizdev-dotfiles.git .dotfiles
 
@@ -69,11 +105,15 @@ curl -s https://ohmyposh.dev/install.sh | sudo -u bn bash -s
 # allows wheel users to sudo without a password 
 sed -i -e 's/^%wheel/# %wheel/' -e 's/^# %wheel/%wheel/' /etc/sudoers
 
+printf "\n#### FINISHED CONFIG : User setup\n\n"
+
 sleep 2
 
 
 # ------------------------------------------------------------
 
+
+[[ "$respType" >= "E" ]] || finish_setup
 
 printf "\n#### BEGIN CONFIG : Java Multi\n\n"
 
@@ -92,6 +132,8 @@ sleep 2
 
 # ------------------------------------------------------------
 
+
+[[ "$respType" >= "F" ]] || finish_setup
 
 printf "\n#### BEGIN CONFIG : Github SSH Keys\n\n"
 
@@ -157,6 +199,8 @@ sleep 2
 # ------------------------------------------------------------
 
 
+[[ "$respType" >= "G" ]] || finish_setup
+
 printf "\n#### BEGIN CONFIG : SFTP\n\n"
 
 printf "Adding biznuvo sftp user\n"
@@ -200,6 +244,8 @@ sleep 2
 # ------------------------------------------------------------
 
 
+[[ "$respType" >= "H" ]] || finish_setup
+
 printf "\n#### BEGIN CONFIG : Build Automation\n\n"
 
 printf "Creating msmtp control files\n"
@@ -241,9 +287,10 @@ chown $SUDO_USER: $SUDO_USER_HOME/cronfile
 
 printf "\n#### END CONFIG : Build Automation\n\n"
 
+sleep 2
+
 
 # ------------------------------------------------------------
 
-read -p "Press enter to reboot"
 
-reboot
+finish_setup
