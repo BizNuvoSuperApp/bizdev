@@ -22,6 +22,7 @@ echo "
 #   F - Github keys
 #   G - SFTP
 #   H - Build Automation
+#   I - Misc
 #   Z - all
 #
 "
@@ -54,7 +55,7 @@ printf "\n#### BEGIN CONFIG : Software\n\n"
 
 dnf -y -q upgrade
 dnf -y -q copr enable lihaohong/yazi
-dnf -y -q install pinentry vim stow git yazi msmtp podman podman-docker podman-compose podman-tui
+dnf -y -q install pinentry vim stow git yazi msmtp docker
 
 # https://discussion.fedoraproject.org/t/vim-default-editor-in-coreos/71356/4
 dnf -y swap nano-default-editor vim-default-editor --allowerasing
@@ -300,6 +301,20 @@ CB_MAIL_CC=
 chown $SUDO_USER: $SUDO_USER_HOME/cronfile
 
 printf "\n#### END CONFIG : Build Automation\n\n"
+
+sleep 2
+
+
+# ------------------------------------------------------------
+
+
+check_cond "$respType" "I"
+
+printf "\n#### BEGIN CONFIG : Misc\n\n"
+
+curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | sudo -u bn bash
+
+printf "\n#### END CONFIG : Misc\n\n"
 
 sleep 2
 
