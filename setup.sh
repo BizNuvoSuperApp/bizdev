@@ -55,7 +55,7 @@ printf "\n#### BEGIN CONFIG : Software\n\n"
 
 dnf -y -q upgrade
 dnf -y -q copr enable lihaohong/yazi
-dnf -y -q install pinentry vim stow git yazi msmtp docker
+dnf -y -q install pinentry vim stow git yazi msmtp docker docker-compose
 
 # https://discussion.fedoraproject.org/t/vim-default-editor-in-coreos/71356/4
 dnf -y swap nano-default-editor vim-default-editor --allowerasing
@@ -315,6 +315,8 @@ printf "\n#### BEGIN CONFIG : Misc\n\n"
 cd $SUDO_USER_HOME
 
 curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | sudo -u bn bash
+
+usermod -a -G docker $SUDO_USER
 
 mkdir docker
 chown $SUDO_USER: docker
