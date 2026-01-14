@@ -232,7 +232,7 @@ chown biznuvo: /var/sftp/biznuvo/downloads
 chmod g+w /var/sftp/biznuvo/downloads
 
 ln -s /var/sftp/biznuvo sftp
-chown $SUDO_USER: sftp
+chown -h $SUDO_USER: sftp
 
 
 printf "Updating sshd with more restrictions for build server\n"
