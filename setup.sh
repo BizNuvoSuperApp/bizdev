@@ -102,15 +102,15 @@ printf "\n#### BEGIN CONFIG : User setup\n\n"
 
 # pull basic dot files for builder, stuff for bashrc and various commands
 cd $SUDO_USER_HOME
-sudo -u bn git clone https://github.com/BizNuvoSuperApp/bizdev-dotfiles.git .dotfiles
+sudo -u $SUDO_USER git clone https://github.com/BizNuvoSuperApp/bizdev-dotfiles.git .dotfiles
 
 # use stow to create links to stuff in .dotfiles so .dotfiles can be a GIT repos
 cd $SUDO_USER_HOME/.dotfiles
-sudo -u bn stow --adopt --no-folding .
-sudo -u bn git reset --hard
+sudo -u $SUDO_USER stow --adopt --no-folding .
+sudo -u $SUDO_USER git reset --hard
 
 # install Oh-my-posh fancy prompt
-curl -s https://ohmyposh.dev/install.sh | sudo -u bn bash -s
+curl -s https://ohmyposh.dev/install.sh | sudo -u $SUDO_USER bash -s
 
 # allows wheel users to sudo without a password 
 sed -i -e 's/^%wheel/# %wheel/' -e 's/^# %wheel/%wheel/' /etc/sudoers
@@ -135,8 +135,6 @@ curl -sL https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-x64_bin.ta
 
 # create link for 
 ln -s jdk-21.0.8 jdk-21
-
-chown -R $SUDO_USER: $SUDO_USER_HOME/.local/jdk*
 
 printf "\n#### FINISHED CONFIG : Java\n\n"
 
@@ -209,10 +207,8 @@ done
 
 rm -rf $tempdir
 
-chown -R $SUDO_USER: $SUDO_USER_HOME/.gitconfig $SUDO_USER_HOME/.ssh
-
 # Do a test connect to GIT to setup ssh keys
-sudo -u bn ssh git@github.com
+sudo -u $SUDO_USER ssh git@ssh.github.com
 
 printf "\n#### FINISHED CONFIG : Github SSH Keys\n\n"
 
@@ -243,7 +239,6 @@ chown biznuvo: /var/sftp/biznuvo/downloads
 chmod g+w /var/sftp/biznuvo/downloads
 
 ln -s /var/sftp/biznuvo sftp
-chown -h $SUDO_USER: sftp
 
 
 printf "Updating sshd with more restrictions for build server\n"
@@ -277,10 +272,10 @@ printf "\n#### BEGIN CONFIG : Build Automation\n\n"
 printf "Creating msmtp control files\n"
 
 cd $SUDO_USER_HOME
-curl $GITDIR/scripts/.msmtprc | sed "s#aliases #aliases ${SUDO_USER_HOME}/#" > .msmtprc
-
-chown -R ${SUDO_USER}: .msmtprc
+curl -o "$GITDIR/scripts/{.msmtprc,cronfile}"
 chmod 600 .msmtprc
+
+sed -i 's/SUDO_USER/'$SUDO_USER'/g' cronfile
 
 
 printf "Creating automation control files\n"
@@ -288,27 +283,10 @@ printf "Creating automation control files\n"
 mkdir $SUDO_USER_HOME/automation
 cd $SUDO_USER_HOME/automation
 
-curl -O "$GITDIR/scripts/{build-if-changed.sh,build.sh,cron-build.sh,common.sh}"
+curl -O "$GITDIR/scripts/automation/{build-if-changed.sh,build.sh,cron-build.sh,common.sh}"
 chmod u+x build-if-changed.sh build.sh cron-build.sh
 
 mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
-chown -R $SUDO_USER: $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs $SUDO_USER_HOME/automation
-
-
-echo "
-PATH=/usr/local/bin:/usr/bin:/home/bn/.local/jdk-21/bin
-JAVA_HOME=/home/bn/.local/jdk-21
-BLD_MAIL_TO=dmcclure@biznuvo.com
-BLD_MAIL_CC=
-BLD_SSH_USER=biznuvo@bizbuilder.asuscomm.com
-
-DD_MAIL_TO=dmcclure@biznuvo.com
-DD_MAIL_CC=
-
-0 0 * * * find /var/sftp/biznuvo/downloads -type f -mtime +21 -delete > $HOME/cleanup.log
-" > $SUDO_USER_HOME/cronfile
-
-chown $SUDO_USER: $SUDO_USER_HOME/cronfile
 
 printf "\n#### END CONFIG : Build Automation\n\n"
 
@@ -324,12 +302,12 @@ printf "\n#### BEGIN CONFIG : Misc\n\n"
 
 cd $SUDO_USER_HOME
 
-curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | sudo -u bn bash
+# Install lazydocker for nice UI about docker stuff
+curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | sudo -u $SUDO_USER bash
 
 usermod -a -G docker $SUDO_USER
 
 mkdir docker
-chown $SUDO_USER: docker
 
 printf "\n#### END CONFIG : Misc\n\n"
 
@@ -337,6 +315,9 @@ sleep 2
 
 
 # ------------------------------------------------------------
+
+
+chown -hR $SUDO_USER: $SUDO_USER_HOME
 
 
 finish_setup
