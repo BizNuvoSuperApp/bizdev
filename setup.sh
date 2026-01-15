@@ -306,9 +306,6 @@ DD_MAIL_TO=dmcclure@biznuvo.com
 DD_MAIL_CC=
 
 0 0 * * * find /var/sftp/biznuvo/downloads -type f -mtime +21 -delete > $HOME/cleanup.log
-
-# Template for build automation
-# */3 * * * * /home/bn/automation/cron-build.sh main 2>&1 >/home/bn/logs/main.debug
 " > $SUDO_USER_HOME/cronfile
 
 chown $SUDO_USER: $SUDO_USER_HOME/cronfile
