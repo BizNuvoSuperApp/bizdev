@@ -2,7 +2,7 @@ EX_LOCK_CONFLICT=200
 EX_NO_BUILD=201
 
 githash() {
-    git rev-parse --short HEAD
+    git rev-parse --short=8 HEAD
 }
 
 datelog() {

@@ -7,15 +7,14 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # ----
 
 export BRANCH=${1}
-
 export BRANCH_SIMPLE=$(echo ${BRANCH} | tr '/' '-')
 export LOGFILE="${HOME}/logs/${BRANCH_SIMPLE}.log"
 
 LOCKFILE="${HOME}/.locks/${BRANCH_SIMPLE}.lock"
 DESTDIR=/var/sftp/biznuvo/downloads
 
-mkdir -p ${HOME}/build-repos
-cd ${HOME}/build-repos
+mkdir -p ${HOME}/repos
+cd ${HOME}/repos
 
 if [ ! -d "${BRANCH}" ]; then
     git clone git@github.com:BizNuvoSuperApp/biznuvo-server-v2.git --quiet --branch ${BRANCH} --single-branch ${BRANCH} 2>&1 >/dev/null
@@ -39,6 +38,7 @@ fi
 
 case ${?} in
 ${EX_LOCK_CONFLICT}|${EX_NO_BUILD})
+    rm ${BUILD_LOGFILE}
     exit
     ;;
 
@@ -51,11 +51,9 @@ ${EX_LOCK_CONFLICT}|${EX_NO_BUILD})
     mv ${LATEST_BUILD_PKG} ${DESTDIR}/${BUILD_LOCATION}
 
     (
-        . ${SCRIPT_DIR}/build-email-aliases
-
         echo "\
-            To: ${mailnotify}
-            Cc: ${mailother}
+            To: ${BLD_MAIL_TO}
+            Cc: ${BLD_MAIL_CC}
             Reply-To: do-not-reply@biznuvo.com
             Subject: Auto Build ${BRANCH} :: SUCCESS
 
@@ -64,7 +62,7 @@ ${EX_LOCK_CONFLICT}|${EX_NO_BUILD})
             Branch: ${BRANCH}
             Commit: ${BUILD_VERSION}
 
-            Archive: sftp://something/downloads/${BUILD_LOCATION}
+            Archive: ${BLD_SSH_USER}:downloads/${BUILD_LOCATION}
 
         " | sed 's/^[[:space:]]*//'
 
@@ -81,11 +79,9 @@ ${EX_LOCK_CONFLICT}|${EX_NO_BUILD})
     BUILD_VERSION=$(githash)
 
     (
-        . ${SCRIPT_DIR}/build-email-aliases
-
         echo "\
-            To: ${mailnotify}
-            Cc: ${mailother}
+            To: ${BLD_MAIL_TO}
+            Cc: ${BLD_MAIL_CC}
             Reply-To: do-not-reply@biznuvo.com
             Subject: Auto Build ${BRANCH} :: FAILURE
 

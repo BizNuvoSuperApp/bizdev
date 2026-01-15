@@ -100,13 +100,16 @@ check_cond "$respType" "D"
 
 printf "\n#### BEGIN CONFIG : User setup\n\n"
 
+# pull basic dot files for builder, stuff for bashrc and various commands
 cd $SUDO_USER_HOME
 sudo -u bn git clone https://github.com/BizNuvoSuperApp/bizdev-dotfiles.git .dotfiles
 
+# use stow to create links to stuff in .dotfiles so .dotfiles can be a GIT repos
 cd $SUDO_USER_HOME/.dotfiles
 sudo -u bn stow --adopt --no-folding .
 sudo -u bn git reset --hard
 
+# install Oh-my-posh fancy prompt
 curl -s https://ohmyposh.dev/install.sh | sudo -u bn bash -s
 
 # allows wheel users to sudo without a password 
@@ -124,10 +127,13 @@ check_cond "$respType" "E"
 
 printf "\n#### BEGIN CONFIG : Java Multi\n\n"
 
+mkdir $SUDO_USER_HOME/.local
 cd $SUDO_USER_HOME/.local
 
+# download jdk and untar it
 curl -sL https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-x64_bin.tar.gz | tar -xvzf -
 
+# create link for 
 ln -s jdk-21.0.8 jdk-21
 
 chown -R $SUDO_USER: $SUDO_USER_HOME/.local/jdk*
@@ -154,6 +160,7 @@ gpg -d $sshkeystempfile | tar -xvf - -C $tempdir
 
 printf "Creating $SUDO_USER_HOME/.gitconfig file\n"
 
+# Create initial .gitconfig with some defaults for how to operate
 echo "[init]
 defaultBranch = main
 
@@ -170,6 +177,9 @@ mkdir -p $SUDO_USER_HOME/.ssh
 
 cd $tempdir
 
+# loop through all keys in the deploy file, creating SSH and GIT config entries to make fetching simple
+# This basically makes GIT create an alias for the host for a specific repository, then SSH maps that
+# alias to specific key and host to retrieve
 for file in *.pub
 do
     pkey=$(basename $file .pub)
@@ -201,7 +211,8 @@ rm -rf $tempdir
 
 chown -R $SUDO_USER: $SUDO_USER_HOME/.gitconfig $SUDO_USER_HOME/.ssh
 
-sudo -u bn ssh -T git@github.com
+# Do a test connect to GIT to setup ssh keys
+sudo -u bn ssh git@github.com
 
 printf "\n#### FINISHED CONFIG : Github SSH Keys\n\n"
 
@@ -277,20 +288,23 @@ printf "Creating automation control files\n"
 mkdir $SUDO_USER_HOME/automation
 cd $SUDO_USER_HOME/automation
 
-printf "mailnotify=DEST1\nmailother=\n" > build-email-aliases
-
-curl -O "$GITDIR/scripts/{build-if-changed.sh,build.sh,cron-build.sh,setup.sh}"
-chown -R $SUDO_USER: $SUDO_USER_HOME/automation
-chmod u+x $SUDO_USER_HOME/automation/*.sh
+curl -O "$GITDIR/scripts/{build-if-changed.sh,build.sh,cron-build.sh,common.sh}"
+chown -R $SUDO_USER: automation
+chmod u+x build-if-changed.sh build.sh cron-build.sh
 
 mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
 chown $SUDO_USER: $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
 
 
-echo "JAVA_HOME=/home/bn/.local/jdk-21
+echo "
 PATH=/usr/local/bin:/usr/bin:/home/bn/.local/jdk-21/bin
-CB_MAIL_TO=dmcclure@biznuvo.com
-CB_MAIL_CC=
+JAVA_HOME=/home/bn/.local/jdk-21
+BLD_MAIL_TO=dmcclure@biznuvo.com
+BLD_MAIL_CC=
+BLD_SSH_USER=biznuvo@bizbuilder.asuscomm.com
+
+DD_MAIL_TO=dmcclure@biznuvo.com
+DD_MAIL_CC=
 
 0 0 * * * find /var/sftp/biznuvo/downloads -type f -mtime +21 -delete > $HOME/cleanup.log
 
