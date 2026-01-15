@@ -159,7 +159,8 @@ gpg -d $sshkeystempfile | tar -xvf - -C $tempdir
 printf "Creating $SUDO_USER_HOME/.gitconfig file\n"
 
 # Create initial .gitconfig with some defaults for how to operate
-echo "[init]
+cat <<EOF > $SUDO_USER_HOME/.gitconfig
+[init]
 defaultBranch = main
 
 [core]
@@ -167,8 +168,7 @@ autocrlf = false
 
 [pull]
 rebase = true
-
-" > $SUDO_USER_HOME/.gitconfig
+EOF
 
 printf "Creating $SUDO_USER_HOME/.ssh/config\n"
 mkdir -p $SUDO_USER_HOME/.ssh
@@ -227,10 +227,13 @@ cd $SUDO_USER_HOME
 printf "Adding biznuvo sftp user\n"
 useradd -m -U -s /sbin/nologin biznuvo
 
-
 printf "Adding biznuvo group to ${SUDO_USER}\n"
 usermod -a -G biznuvo $SUDO_USER
 
+mkdir /home/biznuvo/.ssh
+touch /home/biznuvo/.ssh/authorized_keys
+chown -R biznuvo: /home/biznuvo/.ssh
+chmod go-rwx /home/biznuvo/.ssh/authorized_keys
 
 printf "Creating downloads directory\n"
 mkdir -p /var/sftp/biznuvo/downloads
@@ -272,7 +275,7 @@ printf "\n#### BEGIN CONFIG : Build Automation\n\n"
 printf "Creating msmtp control files\n"
 
 cd $SUDO_USER_HOME
-curl -o "$GITDIR/scripts/{.msmtprc,cronfile}"
+curl -O "$GITDIR/scripts/{.msmtprc,cronfile}"
 chmod 600 .msmtprc
 
 sed -i 's/SUDO_USER/'$SUDO_USER'/g' cronfile
