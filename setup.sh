@@ -289,11 +289,10 @@ mkdir $SUDO_USER_HOME/automation
 cd $SUDO_USER_HOME/automation
 
 curl -O "$GITDIR/scripts/{build-if-changed.sh,build.sh,cron-build.sh,common.sh}"
-chown -R $SUDO_USER: automation
 chmod u+x build-if-changed.sh build.sh cron-build.sh
 
 mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
-chown $SUDO_USER: $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
+chown -R $SUDO_USER: $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs $SUDO_USER_HOME/automation
 
 
 echo "
