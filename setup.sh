@@ -275,8 +275,8 @@ printf "\n#### BEGIN CONFIG : Build Automation\n\n"
 printf "Creating msmtp control files\n"
 
 cd $SUDO_USER_HOME
-curl -O "$GITDIR/scripts/{.msmtprc,cronfile}"
-chmod 600 .msmtprc
+curl -O "$GITDIR/scripts/{.msmtprc,.builderrc,.devdocsrc,cronfile}"
+chmod 600 .msmtprc .builderrc .devdocsrc
 
 sed -i 's/SUDO_USER/'$SUDO_USER'/g' cronfile
 
