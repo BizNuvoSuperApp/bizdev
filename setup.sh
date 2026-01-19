@@ -1,18 +1,19 @@
 export SUDO_USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
 export SFTP_USER=biznuvo
-
 export GITDIR="https://raw.githubusercontent.com/BizNuvoSuperApp/bizdev/main"
 
 
-echo "
+cat <<EOT
+
 #
 # Choose which setup you want to run:
 #
 #   A - Builder Only
 #   B - DevDocs Only
-#   Z - Both (default if enter)
+#   * - Both (default if enter)
 #
-"
+
+EOT
 
 read -p "?? Select setup type: [abZ] " respType
 
@@ -34,22 +35,23 @@ _devdocs() {
     printf "%s/200-devdocs.sh\n" $GITDIR
 }
 
-if [ -n "$respType" ]; then
-	case $respType in
-    A)  printf "# Processing Builder Only\n"
-        sh -c "$(curl $(_basic) $(_builder))"
-        ;;
+_final() {
+    printf "%s/900-final.sh" $GITDIR
+}
 
-    A)  printf "# Processing Devdocs Only\n"
-        sh -c "$(curl $(_basic) $(_devdocs))"
-        ;;
+case $respType in
+A)  printf "# Processing Builder Only\n"
+    sh -c "$(curl $(_basic) $(_builder) $(_final))"
+    ;;
 
-    Z)  printf "# Processing Builder and Devdocs Only\n"
-        sh -c "$(curl $(_basic) $(_builder) $(_devdocs))"
-        ;;
-    esac
-fi
+B)  printf "# Processing Devdocs Only\n"
+    sh -c "$(curl $(_basic) $(_devdocs) $(_final))"
+    ;;
+
+*)  printf "# Processing Builder and Devdocs Only\n"
+    sh -c "$(curl $(_basic) $(_builder) $(_devdocs) $(_final))"
+    ;;
+esac
 
 read -p "Press enter to reboot"
-
 reboot

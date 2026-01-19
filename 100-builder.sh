@@ -73,6 +73,16 @@ git clone https://github.com/BizNuvoSuperApp/bizdev-automation.git automation
 
 mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
 
+
+printf "Updating cronfile\n"
+
+echo <<EOT >$SUDO_USER_HOME/cronfile
+PATH=/usr/local/bin:/usr/bin:$SUDO_USER_HOME/.local/jdk-21/bin
+JAVA_HOME=$SUDO_USER_HOME/.local/jdk-21
+
+0 1 * * * /home/bn/automation/cleanup.py >$SUDO_USER_HOME/cleanup.log 2>&1
+EOT
+
 printf "\n#### END CONFIG : Build Automation\n\n"
 
 sleep 2

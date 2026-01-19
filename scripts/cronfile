@@ -1,4 +1,0 @@
-PATH=/usr/local/bin:/usr/bin:/home/SUDO_USER/.local/jdk-21/bin
-JAVA_HOME=/home/SUDO_USER/.local/jdk-21
-
-0 0 * * * find /var/sftp/biznuvo/downloads -type f -mtime +21 -delete > $HOME/cleanup.log
