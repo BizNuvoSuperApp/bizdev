@@ -112,7 +112,7 @@ curl -sL -o $sshkeystempfile $GITDIR/biznuvo-deploy-keys.tar.gpg
 gpg -d $sshkeystempfile | tar -xvf - -C $tempdir
 
 # Create SSH setup
-printf "Creating $SUDO_USER_HOME/.ssh/config\n"
+printf "\nCreating $SUDO_USER_HOME/.ssh/config\n\n"
 mkdir -p $SUDO_USER_HOME/.ssh
 
 cd $tempdir
