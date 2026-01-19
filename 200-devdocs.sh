@@ -29,7 +29,7 @@ usermod -a -G docker $SUDO_USER
 mkdir $SUDO_USER_HOME/docker
 cd $SUDO_USER_HOME/docker
 
-git clone git@github.com:BizNuvoSuperApp/devdocs.git
+sudo -u $SUDO_USER git clone git@github.com:BizNuvoSuperApp/devdocs.git
 
 
 printf "

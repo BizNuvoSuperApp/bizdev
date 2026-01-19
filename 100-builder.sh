@@ -69,7 +69,7 @@ chmod 600 .builderrc
 
 printf "Getting automation control files\n"
 
-git clone https://github.com/BizNuvoSuperApp/bizdev-automation.git automation
+sudo -u $SUDO_USER git clone https://github.com/BizNuvoSuperApp/bizdev-automation.git automation
 
 mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
 
