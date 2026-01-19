@@ -149,6 +149,7 @@ done
 
 rm -rf $tempdir
 
+printf "\nTest ssh connection to Github\n"
 # Do a test connect to GIT to setup ssh keys
 sudo -u $SUDO_USER ssh git@ssh.github.com
 
