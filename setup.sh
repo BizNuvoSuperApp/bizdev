@@ -1,7 +1,7 @@
-SUDO_USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
-SFTP_USER=biznuvo
+export SUDO_USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
+export SFTP_USER=biznuvo
 
-GITDIR="https://raw.githubusercontent.com/BizNuvoSuperApp/bizdev/main"
+export GITDIR="https://raw.githubusercontent.com/BizNuvoSuperApp/bizdev/main"
 
 
 echo "
