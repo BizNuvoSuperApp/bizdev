@@ -40,7 +40,7 @@ chmod g+w /var/sftp/$SFTP_USER/downloads
 
 ln -s /var/sftp/$SFTP_USER sftp
 
-printf "
+echo "
 Match User $SFTP_USER
     ForceCommand internal-sftp -R
     ChrootDirectory /var/sftp/%u
