@@ -32,9 +32,9 @@ cd $SUDO_USER_HOME/docker
 git clone git@github.com:BizNuvoSuperApp/devdocs.git
 
 
-echo <<EOT >>$SUDO_USER_HOME/cronfile
+printf "
 */3 * * * * $SUDO_USER_HOME/docker/devdocs/cron-build.sh >$SUDO_USER_HOME/devdocs.log 2>&1
-EOT
+" >> $SUDO_USER_HOME/cronfile
 
 printf "\n#### END CONFIG : DevDocs\n\n"
 

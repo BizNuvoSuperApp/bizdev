@@ -40,7 +40,7 @@ chmod g+w /var/sftp/$SFTP_USER/downloads
 
 ln -s /var/sftp/$SFTP_USER sftp
 
-echo <<EOT >>/etc/ssh/sshd_config
+printf "
 Match User $SFTP_USER
     ForceCommand internal-sftp -R
     ChrootDirectory /var/sftp/%u
@@ -48,7 +48,7 @@ Match User $SFTP_USER
     AllowAgentForwarding no
     AllowTcpForwarding no
     X11Forwarding no
-EOT
+" >> /etc/ssh/sshd_config
 
 printf "\n#### END CONFIG : SFTP\n\n"
 
@@ -76,12 +76,12 @@ mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
 
 printf "Updating cronfile\n"
 
-echo <<EOT >$SUDO_USER_HOME/cronfile
+printf "
 PATH=/usr/local/bin:/usr/bin:$SUDO_USER_HOME/.local/jdk-21/bin
 JAVA_HOME=$SUDO_USER_HOME/.local/jdk-21
 
 0 1 * * * /home/bn/automation/cleanup.py >$SUDO_USER_HOME/cleanup.log 2>&1
-EOT
+" >> $SUDO_USER_HOME/cronfile
 
 printf "\n#### END CONFIG : Build Automation\n\n"
 
