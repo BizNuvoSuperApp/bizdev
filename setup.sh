@@ -15,7 +15,7 @@ cat <<EOT
 
 EOT
 
-read -p "?? Select setup type: [abZ] " respType
+read -p "?? Select setup type: " respType
 
 [[ -z "$respType" ]] && respType=Z
 
