@@ -20,13 +20,13 @@ printf "\n#### BEGIN CONFIG : DevDocs\n\n"
 printf "Creating Devdocs control files\n"
 
 cd $SUDO_USER_HOME
-curl -O "$GITDIR/scripts/.devdocsrc"
+sudo -u $SUDO_USER curl -O $GITDIR/scripts/.devdocsrc
 chmod 600 .devdocsrc
 
 
 usermod -a -G docker $SUDO_USER
 
-mkdir $SUDO_USER_HOME/docker
+sudo -u $SUDO_USER mkdir $SUDO_USER_HOME/docker
 cd $SUDO_USER_HOME/docker
 
 sudo -u $SUDO_USER git clone git@github.com:BizNuvoSuperApp/devdocs.git

@@ -60,7 +60,7 @@ printf "\n#### BEGIN CONFIG : User setup\n\n"
 cd $SUDO_USER_HOME
 
 # get default msmtprc file
-curl -O $GITDIR/scripts/.msmtprc
+sudo -u $SUDO_USER curl -O $GITDIR/scripts/.msmtprc
 chmod 600 .msmtprc
 
 
@@ -89,9 +89,9 @@ printf "\n#### BEGIN CONFIG : Git Starter\n\n"
 # Create initial .gitconfig with some defaults for how to operate
 printf "Creating $SUDO_USER_HOME/.gitconfig file\n"
 
-git config --global init.defaultBranch main
-git config --global core.autocrlf false
-git config --global pull.rebase true
+sudo -u $SUDO_USER git config --global init.defaultBranch main
+sudo -u $SUDO_USER git config --global core.autocrlf false
+sudo -u $SUDO_USER git config --global pull.rebase true
 
 printf "\n#### FINISHED CONFIG : Git Starter\n\n"
 
@@ -146,6 +146,9 @@ Host github-%s
 done
 
 rm -rf $tempdir
+
+# Make sure everything owned by SUDO_USER
+chown -hR $SUDO_USER: $SUDO_USER_HOME
 
 printf "\nTest ssh connection to Github\n"
 # Do a test connect to GIT to setup ssh keys

@@ -9,6 +9,9 @@ curl -sL https://download.oracle.com/java/21/archive/jdk-21.0.8_linux-x64_bin.ta
 # create link for 
 ln -s jdk-21.0.8 jdk-21
 
+# Make sure everything owned by SUDO_USER
+chown -hR $SUDO_USER: $SUDO_USER_HOME
+
 printf "\n#### FINISHED CONFIG : Java JDK\n\n"
 
 sleep 2
@@ -18,8 +21,6 @@ sleep 2
 
 
 printf "\n#### BEGIN CONFIG : SFTP\n\n"
-
-cd $SUDO_USER_HOME
 
 printf "Adding $SFTP_USER sftp user\n"
 useradd -m -U -s /sbin/nologin $SFTP_USER
@@ -38,7 +39,8 @@ chmod -R 755 /var/sftp
 chown $SFTP_USER: /var/sftp/$SFTP_USER/downloads
 chmod g+w /var/sftp/$SFTP_USER/downloads
 
-ln -s /var/sftp/$SFTP_USER sftp
+cd $SUDO_USER_HOME
+sudo -u $SUDO_USER ln -s /var/sftp/$SFTP_USER sftp
 
 echo "
 Match User $SFTP_USER
@@ -63,7 +65,8 @@ printf "\n#### BEGIN CONFIG : Build Automation\n\n"
 printf "Creating build control files\n"
 
 cd $SUDO_USER_HOME
-curl -O "$GITDIR/scripts/.builderrc"
+
+sudo -u $SUDO_USER curl -O "$GITDIR/scripts/.builderrc"
 chmod 600 .builderrc
 
 
@@ -71,17 +74,18 @@ printf "Getting automation control files\n"
 
 sudo -u $SUDO_USER git clone https://github.com/BizNuvoSuperApp/bizdev-automation.git automation
 
-mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
+sudo -u $SUDO_USER mkdir $SUDO_USER_HOME/.locks $SUDO_USER_HOME/repos $SUDO_USER_HOME/logs
 
 
 printf "Updating cronfile\n"
 
-printf "
-PATH=/usr/local/bin:/usr/bin:$SUDO_USER_HOME/.local/jdk-21/bin
+printf "PATH=/usr/local/bin:/usr/bin:$SUDO_USER_HOME/.local/jdk-21/bin
 JAVA_HOME=$SUDO_USER_HOME/.local/jdk-21
 
 0 1 * * * /home/bn/automation/cleanup.py >$SUDO_USER_HOME/cleanup.log 2>&1
 " >> $SUDO_USER_HOME/cronfile
+
+chown -hR $SUDO_USER: $SUDO_USER_HOME
 
 printf "\n#### END CONFIG : Build Automation\n\n"
 
