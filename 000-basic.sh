@@ -1,8 +1,8 @@
 printf "\n#### BEGIN CONFIG : Expanding HD\n\n"
 
 # Make sure Fedora root is expanded
-lvextend --extents +100%FREE /dev/mapper/fedora-root
-xfs_growfs /dev/mapper/fedora-root
+lvextend --extents +100%FREE /dev/mapper/fedora*-root
+xfs_growfs /dev/mapper/fedora*-root
 
 printf "\n#### FINISHED CONFIG : Expanding HD\n\n"
 
