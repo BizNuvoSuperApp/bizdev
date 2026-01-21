@@ -40,7 +40,7 @@ else
     hostnamectl set-hostname $hostname
 
     # https://discussion.fedoraproject.org/t/correct-way-to-enable-mdns-on-fedora-server-34/34641/7
-    printf "[Resolve]\nMulticastDNS=resolve\n" >> /etc/systemd/resolved.conf
+    printf "[Resolve]\nMulticastDNS=yes\n" >> /etc/systemd/resolved.conf
 
     systemctl restart systemd-resolved
 
