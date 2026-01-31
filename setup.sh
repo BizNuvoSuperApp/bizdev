@@ -10,7 +10,8 @@ cat <<EOT
 #
 #   A - Builder Only
 #   B - DevDocs Only
-#   * - Both (default if enter)
+#   C - Docker Only
+#   * - All (default if enter)
 #
 
 EOT
@@ -31,6 +32,10 @@ _builder() {
     printf "%s/100-builder.sh\n" $GITDIR
 }
 
+_docker() {
+    printf "%s/150-docker.sh\n" $GITDIR
+}
+
 _devdocs() {
     printf "%s/200-devdocs.sh\n" $GITDIR
 }
@@ -45,11 +50,15 @@ A)  printf "# Processing Builder Only\n"
     ;;
 
 B)  printf "# Processing Devdocs Only\n"
-    sh -c "$(curl $(_basic) $(_devdocs) $(_final))"
+    sh -c "$(curl $(_basic) $(_docker) $(_devdocs) $(_final))"
+    ;;
+
+C)  printf "# Processing Docker Only\n"
+    sh -c "$(curl $(_basic) $(_docker) $(_final))
     ;;
 
 *)  printf "# Processing Builder and Devdocs Only\n"
-    sh -c "$(curl $(_basic) $(_builder) $(_devdocs) $(_final))"
+    sh -c "$(curl $(_basic) $(_builder) $(_docker) $(_devdocs) $(_final))"
     ;;
 esac
 
