@@ -54,7 +54,7 @@ B)  printf "# Processing Devdocs Only\n"
     ;;
 
 C)  printf "# Processing Docker Only\n"
-    sh -c "$(curl $(_basic) $(_docker) $(_final))
+    sh -c "$(curl $(_basic) $(_docker) $(_final))"
     ;;
 
 *)  printf "# Processing Builder and Devdocs Only\n"
