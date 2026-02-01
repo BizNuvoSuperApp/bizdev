@@ -23,44 +23,55 @@ read -p "?? Select setup type: " respType
 respType="${respType:0:1}"
 respType="${respType^^}"
 
+__gitdir() { printf "%s/%s\n" $GITDIR $1; }
 
-_basic() {
-    printf "%s/000-basic.sh\n" $GITDIR
-}
+_basic() { __gitdir 000-basic; }
+_network() { __gitdir 010-network; }
+_user() { __gitdir 020-user; }
+_msmtp() { __gitdir 030-msmtp; }
+_git() { __gitdir 040-git; }
+_sshd() { __gitdir 050-sshd; }
+_docker() { __gitdir 060-docker; }
+_java() { __gitdir 070-java; }
 
-_builder() {
-    printf "%s/100-builder.sh\n" $GITDIR
-}
+_sshkeys() { __gitdir 100-sshkeys; }
 
-_docker() {
-    printf "%s/150-docker.sh\n" $GITDIR
-}
+_builder() { __gitdir 200-builder; }
+_devdocs() { __gitdir 300-devdocs; }
 
-_devdocs() {
-    printf "%s/200-devdocs.sh\n" $GITDIR
-}
-
-_final() {
-    printf "%s/900-final.sh" $GITDIR
-}
 
 case $respType in
 A)  printf "# Processing Builder Only\n"
-    sh -c "$(curl $(_basic) $(_builder) $(_final))"
+    sh -c "$(curl \
+        $(_basic) $(_network) $(_user) $(_msmtp) $(_git) $(_sshd) \
+        $(_java) $(_sshkeys) $(_builder) \
+    )"
     ;;
 
 B)  printf "# Processing Devdocs Only\n"
-    sh -c "$(curl $(_basic) $(_docker) $(_devdocs) $(_final))"
+    sh -c "$(curl \
+        $(_basic) $(_network) $(_user) $(_msmtp) $(_git) $(_sshd) \
+        $(_docker) $(_devdocs) \
+    )"
     ;;
 
 C)  printf "# Processing Docker Only\n"
-    sh -c "$(curl $(_basic) $(_docker) $(_final))"
+    sh -c "$(curl \
+        $(_basic) $(_network) $(_user) $(_msmtp) $(_git) $(_sshd) \
+        $(_docker) \
+    )"
     ;;
 
-*)  printf "# Processing Builder and Devdocs Only\n"
-    sh -c "$(curl $(_basic) $(_builder) $(_docker) $(_devdocs) $(_final))"
+*)  printf "# Processing Builder and Devdocs\n"
+    sh -c "$(curl \
+        $(_basic) $(_network) $(_user) $(_msmtp) $(_git) $(_sshd) \
+        $(_java) $(_sshkeys) $(_builder) \
+        $(_docker) $(_devdocs) \
+    )"
     ;;
 esac
+
+chown -hR $SUDO_USER: $SUDO_USER_HOME
 
 read -p "Press enter to reboot"
 reboot
