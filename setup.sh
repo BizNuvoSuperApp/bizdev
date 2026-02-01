@@ -23,7 +23,7 @@ read -p "?? Select setup type: " respType
 respType="${respType:0:1}"
 respType="${respType^^}"
 
-__gitdir() { printf "%s/%s\n" $GITDIR $1; }
+__gitdir() { printf "%s/%s.sh\n" $GITDIR $1; }
 
 _basic() { __gitdir 000-basic; }
 _network() { __gitdir 010-network; }
