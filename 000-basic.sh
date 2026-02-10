@@ -14,7 +14,7 @@ printf "\n#### BEGIN CONFIG : Basic Software\n\n"
 
 dnf -y -q upgrade
 dnf -y -q copr enable lihaohong/yazi
-dnf -y -q install pinentry vim stow git yazi msmtp
+dnf -y -q install pinentry vim stow git yazi msmtp gum
 
 # https://discussion.fedoraproject.org/t/vim-default-editor-in-coreos/71356/4
 dnf -y swap nano-default-editor vim-default-editor --allowerasing
